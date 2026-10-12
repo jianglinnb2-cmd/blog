@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的博客</title>
+<style>
+/* ========== Reset & Base ========== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px}
+body{
+  font-family:"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.7;
+  overflow-x:hidden;
+}
+
+/* ========== CSS Variables ========== */
+:root{
+  --bg:#f6f4f1;
+  --surface:#fafaf8;
+  --text:#3b3b3b;
+  --text-light:#8b8680;
+  --border:#dfdad3;
+  --line:#d5cfc7;
+  --accent-1:#879b8a;
+  --accent-2:#8190a2;
+  --accent-3:#bfa9a2;
+  --accent-4:#b0a28a;
+  --radius:6px;
+  --max-width:960px;
+  --nav-height:60px;
+}
+
+/* ========== Nav ========== */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  height:var(--nav-height);
+  background:rgba(246,244,241,0.92);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.nav-inner{
+  max-width:var(--max-width);margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  height:100%;padding:0 24px;
+}
+.nav-logo{
+  font-size:1.1rem;font-weight:500;letter-spacing:0.04em;
+  color:var(--text);text-decoration:none;
+}
+.nav-links{display:flex;gap:28px;list-style:none}
+.nav-links a{
+  text-decoration:none;color:var(--text-light);font-size:0.9rem;
+  position:relative;padding:4px 0;transition:color .25s;
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:0;left:0;width:0;height:1px;
+  background:var(--accent-1);transition:width .3s ease;
+}
+.nav-links a:hover,.nav-links a.active{color:var(--text)}
+.nav-links a:hover::after,.nav-links a.active::after{width:100%}
+
+/* hamburger */
+.nav-toggle{
+  display:none;flex-direction:column;gap:5px;cursor:pointer;
+  background:none;border:none;padding:4px;
+}
+.nav-toggle span{
+  display:block;width:22px;height:1.5px;background:var(--text);
+  transition:all .3s;
+}
+.nav-toggle.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+.nav-toggle.open span:nth-child(2){opacity:0}
+.nav-toggle.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+
+/* ========== Sections Common ========== */
+.section{padding:80px 24px;max-width:var(--max-width);margin:0 auto}
+.section-label{
+  font-size:0.8rem;text-transform:uppercase;letter-spacing:0.12em;
+  color:var(--text-light);margin-bottom:8px;
+}
+.section-title{
+  font-size:1.8rem;font-weight:500;color:var(--text);margin-bottom:40px;
+  position:relative;display:inline-block;
+}
+.section-title::after{
+  content:'';position:absolute;bottom:-8px;left:0;
+  width:52px;height:2px;background:var(--accent-1);border-radius:1px;
+}
+
+/* ========== Hero ========== */
+.hero{
+  min-height:100vh;display:flex;align-items:center;
+  justify-content:center;position:relative;
+  padding:calc(var(--nav-height) + 60px) 24px 60px;
+}
+.hero-bg-curve{
+  position:absolute;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;z-index:0;opacity:0.25;
+}
+.hero-content{text-align:center;position:relative;z-index:1}
+.hero-avatar{
+  width:96px;height:96px;border-radius:50%;
+  border:2px solid var(--line);margin:0 auto 28px;
+  overflow:hidden;line-height:0;
+}
+.hero-name{
+  font-size:2.4rem;font-weight:400;letter-spacing:0.06em;
+  color:var(--text);margin-bottom:12px;
+}
+.hero-tagline{
+  font-size:1.05rem;color:var(--text-light);max-width:420px;
+  margin:0 auto 36px;line-height:1.8;
+}
+.hero-enter{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:0.85rem;color:var(--text-light);text-decoration:none;
+  transition:color .3s;
+}
+.hero-enter:hover{color:var(--accent-2)}
+.hero-enter svg{animation:bounce 2s infinite}
+
+/* ===== 桌面端 Hero 独立封页 ===== */
+@media(min-width:769px){
+  .hero{
+    min-height:100vh;display:flex;align-items:center;
+    justify-content:center;padding:0 24px;
+  }
+  .hero-avatar{width:120px;height:120px;margin-bottom:36px}
+  .hero-name{font-size:3rem;margin-bottom:16px}
+  .hero-tagline{font-size:1.1rem;margin-bottom:48px;max-width:480px}
+  .hero-enter{
+    padding:12px 36px;
+    border:1px solid var(--accent-1);border-radius:var(--radius);
+    color:var(--accent-1);font-size:0.95rem;letter-spacing:0.05em;
+    transition:all .35s;
+  }
+  .hero-enter:hover{
+    background:var(--accent-1);color:#fff;
+    gap:12px;
+  }
+  .hero-enter svg{animation:none}
+  .hero-bg-curve{opacity:0.35}
+}
+
+@keyframes bounce{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(6px)}
+}
+
+/* ========== About / Social ========== */
+.about-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:40px;
+  align-items:start;
+}
+.about-text p{color:var(--text-light);margin-bottom:16px;font-size:0.95rem}
+.social-list{display:flex;flex-direction:column;gap:14px}
+.social-item{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 18px;
+  border:1px solid var(--border);border-radius:var(--radius);
+  text-decoration:none;color:var(--text);
+  transition:all .3s;background:var(--surface);
+}
+.social-item:hover{
+  border-color:var(--accent-2);
+  transform:translateX(4px);
+}
+.social-item svg{width:22px;height:22px;flex-shrink:0}
+.social-item .social-label{font-size:0.85rem;color:var(--text-light)}
+.social-item .social-value{font-size:0.95rem;font-weight:500}
+.social-item.wechat{cursor:default}
+
+/* ========== Works ========== */
+/* ===== works layout wrapper ===== */
+.works-layout{display:flex;gap:48px;align-items:flex-start}
+
+/* tabs — 默认横向（手机） */
+.works-tabs{
+  display:flex;gap:0;margin-bottom:32px;
+  border-bottom:1px solid var(--line);
+}
+.works-tab-btn{
+  padding:10px 24px;font-size:0.9rem;cursor:pointer;
+  background:none;border:none;color:var(--text-light);
+  position:relative;transition:color .25s;
+  font-family:inherit;letter-spacing:0.03em;
+}
+.works-tab-btn::after{
+  content:'';position:absolute;bottom:-1px;left:0;right:0;
+  height:2px;background:var(--accent-1);
+  transform:scaleX(0);transition:transform .3s ease;
+}
+.works-tab-btn:hover{color:var(--text)}
+.works-tab-btn.active{color:var(--text)}
+.works-tab-btn.active::after{transform:scaleX(1)}
+
+.works-content{flex:1;min-width:0}
+.works-tab-panel{display:none}
+.works-tab-panel.active{display:block}
+
+/* ===== 桌面端：左侧竖排菜单 ===== */
+@media(min-width:769px){
+  .works-layout{gap:56px}
+  .works-tabs{
+    flex-shrink:0;width:150px;
+    flex-direction:column;gap:4px;
+    border-bottom:none;border-right:1px solid var(--line);
+    padding-right:20px;margin-bottom:0;
+    position:sticky;top:calc(var(--nav-height) + 20px);
+  }
+  .works-tab-btn{
+    padding:10px 14px;font-size:0.88rem;text-align:left;
+    border-radius:0 var(--radius) var(--radius) 0;
+  }
+  .works-tab-btn::after{display:none}
+  .works-tab-btn::before{
+    content:'';position:absolute;left:-21px;top:50%;
+    transform:translateY(-50%) scaleY(0);
+    width:2px;height:16px;background:var(--accent-1);
+    border-radius:1px;transition:transform .3s ease;
+  }
+  .works-tab-btn:hover{color:var(--text);background:rgba(0,0,0,0.02)}
+  .works-tab-btn.active{color:var(--accent-1);background:rgba(0,0,0,0.03)}
+  .works-tab-btn.active::before{transform:translateY(-50%) scaleY(1)}
+}
+
+.works-intro{
+  font-size:0.92rem;color:var(--text-light);
+  margin-bottom:28px;line-height:1.8;
+  padding-left:16px;border-left:2px solid var(--accent-3);
+}
+
+.works-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:24px;
+}
+.work-card{
+  border:1px solid var(--border);border-radius:var(--radius);
+  overflow:hidden;background:var(--surface);
+  transition:all .35s;position:relative;
+}
+.work-card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 12px 32px rgba(0,0,0,0.04);
+  border-color:var(--line);
+}
+a.work-card-link{
+  text-decoration:none;color:inherit;display:block;
+  border-radius:var(--radius);
+}
+a.work-card-link .work-card{
+  border:1px solid var(--border);border-radius:var(--radius);
+  overflow:hidden;background:var(--surface);
+  transition:all .35s;position:relative;
+}
+a.work-card-link:hover .work-card{
+  transform:translateY(-4px);
+  box-shadow:0 12px 32px rgba(0,0,0,0.04);
+  border-color:var(--line);
+}
+.work-card-thumb{
+  position:relative;overflow:hidden;
+  border-radius:var(--radius) var(--radius) 0 0;
+  line-height:0;
+}
+.work-card-thumb img{
+  width:100%;height:auto;display:block;
+  border-radius:var(--radius) var(--radius) 0 0;
+}
+.work-card-thumb svg{opacity:0.35;transition:opacity .3s}
+.work-card:hover .work-card-thumb svg{opacity:0.5}
+.work-card-body{padding:20px}
+.work-card-body h3{font-size:1.05rem;font-weight:500;margin-bottom:6px}
+.work-card-body p{font-size:0.85rem;color:var(--text-light);margin-bottom:12px}
+.work-card-tags{display:flex;flex-wrap:wrap;gap:6px}
+.work-card-tags span{
+  font-size:0.72rem;padding:3px 10px;
+  border:1px solid var(--border);border-radius:20px;
+  color:var(--text-light);
+}
+
+/* mobile: 恢复上下布局 */
+@media(max-width:768px){
+  .works-layout{display:block}
+  .works-tabs{
+    flex-direction:row;gap:0;overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    border-bottom:1px solid var(--line);border-right:none;
+    padding-right:0;margin-bottom:32px;
+    position:static;width:auto;
+  }
+  .works-tab-btn{
+    padding:10px 16px;font-size:0.85rem;white-space:nowrap;
+    text-align:center;border-radius:0;
+  }
+  .works-tab-btn::before{display:none}
+  .works-tab-btn::after{display:block}
+  .works-tab-btn.active{color:var(--text);background:transparent}
+  .works-content{flex:none}
+}
+
+/* ========== Guestbook ========== */
+.guestbook-form{
+  max-width:600px;
+  display:flex;flex-direction:column;gap:18px;
+}
+.guestbook-form input,
+.guestbook-form textarea{
+  width:100%;padding:12px 16px;
+  border:1px solid var(--border);border-radius:var(--radius);
+  background:var(--surface);font-size:0.95rem;font-family:inherit;
+  color:var(--text);outline:none;transition:border-color .3s;
+  resize:vertical;
+}
+.guestbook-form input:focus,
+.guestbook-form textarea:focus{border-color:var(--accent-2)}
+.guestbook-form textarea{min-height:120px}
+.guestbook-form button{
+  align-self:flex-start;padding:10px 32px;
+  border:1px solid var(--accent-1);border-radius:var(--radius);
+  background:transparent;color:var(--accent-1);
+  font-size:0.9rem;cursor:pointer;letter-spacing:0.04em;
+  transition:all .3s;
+}
+.guestbook-form button:hover{
+  background:var(--accent-1);color:#fff;
+}
+.form-success{
+  display:none;color:var(--accent-1);font-size:0.9rem;
+  padding:12px 18px;border:1px solid var(--accent-1);
+  border-radius:var(--radius);margin-top:8px;
+}
+
+/* ========== Extra: Interests ========== */
+.interests-cloud{
+  display:flex;flex-wrap:wrap;gap:12px;justify-content:center;
+}
+.interest-tag{
+  padding:8px 20px;
+  border:1px solid var(--border);border-radius:24px;
+  font-size:0.88rem;color:var(--text-light);
+  transition:all .3s;cursor:default;
+}
+.interest-tag:hover{
+  border-color:var(--accent-3);color:var(--accent-3);
+  transform:translateY(-2px);
+}
+
+/* ========== Extra: Quote ========== */
+.quote-block{
+  text-align:center;padding:40px 24px;
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  max-width:600px;margin:0 auto;
+}
+.quote-text{
+  font-size:1.2rem;font-style:italic;color:var(--text);
+  line-height:1.8;margin-bottom:12px;
+}
+.quote-author{font-size:0.85rem;color:var(--text-light)}
+
+/* ========== Curve Divider ========== */
+.curve-divider{
+  width:100%;height:60px;overflow:hidden;line-height:0;
+  pointer-events:none;
+}
+.curve-divider svg{width:100%;height:100%}
+
+/* ========== Footer ========== */
+.footer{
+  text-align:center;padding:40px 24px;
+  border-top:1px solid var(--line);
+  color:var(--text-light);font-size:0.82rem;
+}
+.footer a{color:var(--accent-2);text-decoration:none}
+
+/* ========== Mobile ========== */
+@media(max-width:768px){
+  .nav-links{
+    position:fixed;top:var(--nav-height);left:0;right:0;
+    background:rgba(246,244,241,0.97);
+    backdrop-filter:blur(10px);
+    flex-direction:column;gap:0;
+    max-height:0;overflow:hidden;transition:max-height .35s ease;
+    border-bottom:1px solid var(--line);
+  }
+  .nav-links.open{max-height:300px}
+  .nav-links a{
+    display:block;padding:16px 24px;border-top:1px solid var(--line);
+  }
+  .nav-toggle{display:flex}
+
+  .hero-name{font-size:1.8rem}
+  .section-title{font-size:1.5rem}
+
+  .about-grid{grid-template-columns:1fr;gap:32px}
+  .works-grid{grid-template-columns:1fr}
+  .section{padding:60px 20px}
+}
+
+@media(max-width:400px){
+  .hero-name{font-size:1.5rem}
+  .hero-tagline{font-size:0.92rem}
+  .section{padding:48px 16px}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== Nav ===== -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">~/blog</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#about">关于</a></li>
+      <li><a href="#works">作品</a></li>
+      <li><a href="#guestbook">留言</a></li>
+    </ul>
+    <button class="nav-toggle" id="navToggle" aria-label="菜单">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ===== Hero ===== -->
+<section class="hero">
+  <div class="hero-bg-curve">
+    <svg viewBox="0 0 1440 900" preserveAspectRatio="none">
+      <path d="M0,700 C360,620 720,820 1080,680 C1260,610 1380,650 1440,680 L1440,900 L0,900Z"
+            fill="none" stroke="#d5cfc7" stroke-width="1"/>
+      <path d="M0,750 C300,690 660,840 960,730 C1140,660 1320,700 1440,730 L1440,900 L0,900Z"
+            fill="none" stroke="#d5cfc7" stroke-width="0.5" opacity="0.5"/>
+    </svg>
+  </div>
+  <div class="hero-content">
+    <div class="hero-avatar">
+      <img src="avatar.jpg" alt="头像" width="96" height="96" style="width:100%;height:100%;object-fit:cover;border-radius:50%">
+    </div>
+    <h1 class="hero-name">你好，我是玖月</h1>
+    <p class="hero-tagline">一个喜欢用代码和文字记录生活的人。这里是我的小角落，欢迎你来逛逛 ✨</p>
+    <a href="#about" class="hero-enter">
+      进入博客
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
+    </a>
+  </div>
+</section>
+
+<!-- ===== Curve Divider ===== -->
+<div class="curve-divider">
+  <svg viewBox="0 0 1200 60" preserveAspectRatio="none">
+    <path d="M0,30 C300,0 600,60 900,30 C1050,15 1150,20 1200,24 L1200,60 L0,60Z"
+          fill="#fafaf8"/>
+  </svg>
+</div>
+
+<!-- ===== About ===== -->
+<section class="section" id="about" style="background:var(--surface)">
+  <p class="section-label">· About ·</p>
+  <h2 class="section-title">关于我</h2>
+  <div class="about-grid">
+    <div class="about-text">
+      <p>这里写一段自我介绍～ 可以聊聊你的兴趣爱好、擅长的领域、或者正在做的事情。</p>
+      <p>比如：一个喜欢捣鼓前端和设计的开发者，偶尔拍拍视频，写写文章。喜欢简洁的东西，也喜欢有趣的人。</p>
+    </div>
+    <div class="social-list">
+      <!-- Bilibili -->
+      <a class="social-item" href="https://b23.tv/26v5eJj" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#8190a2" stroke-width="1.2">
+          <rect x="2" y="4" width="20" height="16" rx="4"/>
+          <path d="M8 9v6M12 9v6M16 9v6" stroke-width="1"/>
+          <circle cx="8" cy="10" r="1.5" fill="#8190a2"/>
+          <circle cx="12" cy="11" r="1.5" fill="#8190a2"/>
+          <circle cx="16" cy="10" r="1.5" fill="#8190a2"/>
+        </svg>
+        <div>
+          <div class="social-label">哔哩哔哩</div>
+          <div class="social-value">@林夕呱</div>
+        </div>
+      </a>
+      <!-- WeChat -->
+      <div class="social-item wechat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#b0a28a" stroke-width="1.2">
+          <path d="M8 10.5c-3.3 0-6 2.2-6 4.9 0 1.5.8 2.9 2.1 3.8L3.5 21l2.2-1.1c.7.2 1.5.3 2.3.3 3.3 0 6-2.2 6-4.9s-2.7-4.8-6-4.8z"/>
+          <circle cx="6" cy="14" r="0.8" fill="#b0a28a"/>
+          <circle cx="9.5" cy="14" r="0.8" fill="#b0a28a"/>
+          <path d="M14 3C11.2 3 9 5 9 7.5s2.2 4.5 5 4.5c.6 0 1.1-.1 1.6-.2L17 13l-.4-1.8c1-.7 1.4-1.7 1.4-2.7C18 5 16.2 3 14 3z"/>
+          <circle cx="12" cy="7" r="0.7" fill="#b0a28a"/>
+          <circle cx="15" cy="7" r="0.7" fill="#b0a28a"/>
+        </svg>
+        <div>
+          <div class="social-label">微信</div>
+          <div class="social-value">微信号：h18479737480</div>
+        </div>
+      </div>
+      <!-- QQ -->
+      <a class="social-item" href="https://user.qzone.qq.com/3397420090" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#879b8a" stroke-width="1.2">
+          <ellipse cx="12" cy="7" rx="7" ry="4.5"/>
+          <path d="M5 7c0 2.5 3.1 4.5 7 4.5s7-2 7-4.5"/>
+          <path d="M8 9l-1.5 3M16 9l1.5 3"/>
+          <path d="M9 17h6c0 2-1.3 3.5-3 3.5s-3-1.5-3-3.5z"/>
+          <circle cx="9" cy="7" r="1" fill="#879b8a"/>
+          <circle cx="15" cy="7" r="1" fill="#879b8a"/>
+        </svg>
+        <div>
+          <div class="social-label">QQ</div>
+          <div class="social-value">QQ号：3397420090</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Curve Divider ===== -->
+<div class="curve-divider">
+  <svg viewBox="0 0 1200 60" preserveAspectRatio="none">
+    <path d="M0,60 C300,30 600,0 900,30 C1050,45 1150,40 1200,36 L1200,0 L0,0Z"
+          fill="#fafaf8"/>
+  </svg>
+</div>
+
+<!-- ===== Works ===== -->
+<section class="section" id="works">
+  <p class="section-label">· Works ·</p>
+  <h2 class="section-title">我的作品</h2>
+
+  <div class="works-layout">
+  <nav class="works-tabs" id="worksTabs">
+    <button class="works-tab-btn active" data-tab="photo">📷 摄影作品</button>
+    <button class="works-tab-btn" data-tab="project">💻 项目作品</button>
+    <button class="works-tab-btn" data-tab="writing">📝 文字随笔</button>
+  </nav>
+
+  <div class="works-content">
+  <!-- 摄影作品 -->
+  <div class="works-tab-panel active" id="tab-photo">
+    <p class="works-intro">用镜头记录风景，捕捉光影流转的瞬间。喜欢在旅途中按下快门，把山川湖海、朝霞落日装进取景框。每一张照片，都是一段行走的记忆。</p>
+    <div class="works-grid">
+      <div class="work-card">
+        <div class="work-card-thumb">
+          <img src="photo1.jpg" alt="晨雾山间">
+        </div>
+        <div class="work-card-body">
+          <h3>晨雾 · 山间</h3>
+          <p>清晨薄雾缭绕山间，万物在微光中慢慢苏醒。</p>
+          <div class="work-card-tags">
+            <span>风光</span><span>旅行</span>
+          </div>
+        </div>
+      </div>
+      <div class="work-card">
+        <div class="work-card-thumb">
+          <img src="photo2.jpg" alt="远行天际">
+        </div>
+        <div class="work-card-body">
+          <h3>远行 · 天际</h3>
+          <p>路的尽头是天空，脚步不停，风景不止。</p>
+          <div class="work-card-tags">
+            <span>街拍</span><span>光影</span>
+          </div>
+        </div>
+      </div>
+      <div class="work-card">
+        <div class="work-card-thumb">
+          <img src="photo3.jpg" alt="暮色归途">
+        </div>
+        <div class="work-card-body">
+          <h3>暮色 · 归途</h3>
+          <p>黄昏把世界染成暖色，归途也变得温柔。</p>
+          <div class="work-card-tags">
+            <span>日常</span><span>静物</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 项目作品 -->
+  <div class="works-tab-panel" id="tab-project">
+    <div class="works-grid">
+      <div class="work-card">
+        <div class="work-card-thumb">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#879b8a" stroke-width="1">
+            <rect x="2" y="3" width="20" height="14" rx="2"/>
+            <path d="M8 21h8M12 17v4"/>
+          </svg>
+        </div>
+        <div class="work-card-body">
+          <h3>作品名称 #1</h3>
+          <p>简短描述这个项目做了什么、用了什么技术。</p>
+          <div class="work-card-tags">
+            <span>HTML</span><span>CSS</span><span>JavaScript</span>
+          </div>
+        </div>
+      </div>
+      <div class="work-card">
+        <div class="work-card-thumb">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#8190a2" stroke-width="1">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 6v6l4 2"/>
+          </svg>
+        </div>
+        <div class="work-card-body">
+          <h3>作品名称 #2</h3>
+          <p>简短描述这个项目做了什么、用了什么技术。</p>
+          <div class="work-card-tags">
+            <span>Python</span><span>Flask</span>
+          </div>
+        </div>
+      </div>
+      <div class="work-card">
+        <div class="work-card-thumb">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#bfa9a2" stroke-width="1">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+        </div>
+        <div class="work-card-body">
+          <h3>作品名称 #3</h3>
+          <p>简短描述这个项目做了什么、用了什么技术。</p>
+          <div class="work-card-tags">
+            <span>React</span><span>Node.js</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 文字随笔 -->
+  <div class="works-tab-panel" id="tab-writing">
+    <p class="works-intro">偶尔写点东西，记录一些想法和感受。文字是另一种镜头，用来捕捉内心的风景。</p>
+    <div class="works-grid">
+      <a class="work-card-link" href="essay1.md" target="_blank">
+        <div class="work-card">
+          <div class="work-card-thumb">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#879b8a" stroke-width="1">
+              <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+              <line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="14" y2="11"/>
+            </svg>
+          </div>
+          <div class="work-card-body">
+            <h3>随笔 #1</h3>
+            <p>点击打开编辑 →</p>
+            <div class="work-card-tags">
+              <span>随笔</span><span>日常</span>
+            </div>
+          </div>
+        </div>
+      </a>
+      <a class="work-card-link" href="essay2.md" target="_blank">
+        <div class="work-card">
+          <div class="work-card-thumb">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#8190a2" stroke-width="1">
+              <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+          </div>
+          <div class="work-card-body">
+            <h3>随笔 #2</h3>
+            <p>点击打开编辑 →</p>
+            <div class="work-card-tags">
+              <span>笔记</span><span>灵感</span>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+  </div><!-- /works-content -->
+</div><!-- /works-layout -->
+</section>
+
+<!-- ===== Quote ===== -->
+<div class="section">
+  <div class="quote-block">
+    <p class="quote-text">"Less is more. 简洁不是少，而是恰到好处。"</p>
+    <p class="quote-author">—— 我喜欢的信条</p>
+  </div>
+</div>
+
+<!-- ===== Guestbook ===== -->
+<section class="section" id="guestbook">
+  <p class="section-label">· Guestbook ·</p>
+  <h2 class="section-title">意见箱 / 留言板</h2>
+  <form class="guestbook-form" id="guestbookForm">
+    <input type="text" placeholder="你的名字（选填）" name="name">
+    <textarea placeholder="写点什么吧... 建议、感想、或者打个招呼都可以～" name="message" required></textarea>
+    <button type="submit">发送留言</button>
+    <div class="form-success" id="formSuccess">✨ 收到啦，感谢你的留言！</div>
+  </form>
+</section>
+
+<!-- ===== Interests ===== -->
+<section class="section" style="background:var(--surface);text-align:center">
+  <p class="section-label">· Interests ·</p>
+  <h2 class="section-title" style="display:inline-block">兴趣与日常</h2>
+  <div class="interests-cloud" style="margin-top:32px">
+    <span class="interest-tag">💻 前端开发</span>
+    <span class="interest-tag">📷 摄影</span>
+    <span class="interest-tag">🎬 视频剪辑</span>
+    <span class="interest-tag">📝 写作</span>
+    <span class="interest-tag">🎧 音乐</span>
+    <span class="interest-tag">☕ 咖啡</span>
+    <span class="interest-tag">🚲 骑行</span>
+    <span class="interest-tag">📚 阅读</span>
+  </div>
+</section>
+
+<!-- ===== Footer ===== -->
+<footer class="footer">
+  <p>© 2026 我的博客 · 用 ❤️ 和代码搭建</p>
+  <p style="margin-top:4px"><a href="#top">↑ 回到顶部</a></p>
+</footer>
+
+<script>
+// Mobile nav toggle
+const toggle = document.getElementById('navToggle');
+const links = document.getElementById('navLinks');
+toggle.addEventListener('click',()=>{
+  toggle.classList.toggle('open');
+  links.classList.toggle('open');
+});
+links.querySelectorAll('a').forEach(a=>{
+  a.addEventListener('click',()=>{
+    toggle.classList.remove('open');
+    links.classList.remove('open');
+  });
+});
+
+// Guestbook form
+const form = document.getElementById('guestbookForm');
+const success = document.getElementById('formSuccess');
+const submitBtn = form.querySelector('button');
+form.addEventListener('submit',async e=>{
+  e.preventDefault();
+  const msg = form.message.value.trim();
+  if(!msg) return;
+  submitBtn.disabled = true;
+  submitBtn.textContent = '发送中...';
+  try {
+    const res = await fetch('/api/message', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        name: form.name.value.trim(),
+        message: msg
+      })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      form.reset();
+      form.style.display = 'none';
+      success.style.display = 'block';
+      success.textContent = '✨ 收到啦，感谢你的留言！';
+    } else {
+      alert('发送失败：' + (data.error || '未知错误'));
+    }
+  } catch(err) {
+    alert('发送失败，请确认服务器已启动');
+  }
+  submitBtn.disabled = false;
+  submitBtn.textContent = '发送留言';
+});
+
+// Works tab switching
+const tabBtns = document.querySelectorAll('.works-tab-btn');
+const tabPanels = document.querySelectorAll('.works-tab-panel');
+tabBtns.forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const tab = btn.dataset.tab;
+    tabBtns.forEach(b=>b.classList.remove('active'));
+    tabPanels.forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-'+tab).classList.add('active');
+  });
+});
+
+// Active nav link on scroll
+const navAs = document.querySelectorAll('.nav-links a');
+const sections = [...navAs].map(a=>document.querySelector(a.getAttribute('href')));
+window.addEventListener('scroll',()=>{
+  const scrollY = window.scrollY + 100;
+  sections.forEach((sec,i)=>{
+    if(sec && sec.offsetTop <= scrollY && sec.offsetTop+sec.offsetHeight > scrollY){
+      navAs.forEach(a=>a.classList.remove('active'));
+      navAs[i].classList.add('active');
+    }
+  });
+});
+</script>
+</body>
+</html>
